@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F2F Online Marketplace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="container">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>F2F Online Marketplace</h1>
+                <p class="current-time" id="currentTime"></p>
+                <p class="current-user">Welcome, Muntasir-Mamun7</p>
+            </div>
+            <div class="login-buttons">
+                <button onclick="loginAsFarmer()" class="btn btn-primary">
+                    <i class="fas fa-tractor"></i> Login as Farmer
+                </button>
+                <button onclick="loginAsBuyer()" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart"></i> Login as Buyer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farmer Dashboard -->
+    <div id="farmerDashboard" class="container hidden">
+        <div class="dashboard-nav">
+            <div class="dashboard-header">
+                <h2>Welcome, <span id="farmerName"></span></h2>
+                <p class="current-time" id="farmerDashboardTime"></p>
+            </div>
+            <button onclick="logout()" class="btn btn-danger">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <!-- Add Product Form -->
+        <div class="add-product-form">
+            <h3>Add New Product</h3>
+            <form onsubmit="addProduct(); return false;">
+                <div class="form-group">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Price ($)</label>
+                    <input type="number" id="productPrice" class="form-control" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="productQuantity">Quantity</label>
+                    <input type="number" id="productQuantity" class="form-control" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" class="form-control" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="productImage">Image URL</label>
+                    <input type="url" id="productImage" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Product
+                </button>
+            </form>
+        </div>
+
+        <!-- Farmer's Products List -->
+        <div id="farmerProducts" class="product-grid">
+            <!-- Products will be dynamically added here -->
+        </div>
+    </div>
+
+    <!-- Buyer Dashboard -->
+    <div id="buyerDashboard" class="container hidden">
+        <div class="dashboard-nav">
+            <div class="dashboard-header">
+                <h2>Welcome, <span id="buyerName"></span></h2>
+                <div class="user-info">
+                    <p class="current-time" id="buyerDashboardTime"></p>
+                    <p class="current-user">User: Muntasir-Mamun7</p>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <button onclick="showCart()" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                    <span id="cartCount" class="cart-badge">0</span>
+                </button>
+                <button onclick="logout()" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+            <div class="search-box">
+                <input type="text" id="searchProducts" placeholder="Search products..." class="form-control">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="filter-options">
+                <select id="sortBy" class="form-control">
+                    <option value="default">Sort by</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="name">Name: A to Z</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Available Products -->
+        <div id="availableProducts" class="product-grid">
+            <!-- Products will be dynamically added here -->
+        </div>
+
+        <!-- Shopping Cart -->
+        <div id="cart" class="cart-container hidden">
+            <div class="cart-header">
+                <h3>Shopping Cart</h3>
+                <button onclick="closeCart()" class="btn btn-small">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="cartItems">
+                <!-- Cart items will be dynamically added here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    Total: $<span id="cartTotal">0.00</span>
+                </div>
+                <div class="cart-actions">
+                    <button onclick="clearCart()" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Clear Cart
+                    </button>
+                    <button onclick="checkout()" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Modal -->
+        <div id="checkoutModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Checkout</h3>
+                    <button onclick="closeCheckoutModal()" class="btn btn-small">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="checkoutForm" onsubmit="processCheckout(event)">
+                    <div class="form-group">
+                        <label for="deliveryAddress">Delivery Address</label>
+                        <textarea id="deliveryAddress" class="form-control" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method</label>
+                        <select id="paymentMethod" class="form-control" required>
+                            <option value="">Select payment method</option>
+                            <option value="cash">Cash on Delivery</option>
+                            <option value="card">Credit/Debit Card</option>
+                            <option value="bkash">bKash</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Contact Number</label>
+                        <input type="tel" id="phoneNumber" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Confirm Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Time Script -->
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toUTCString();
+            document.getElementById('currentTime').textContent = `UTC: ${timeString}`;
+            document.getElementById('buyerDashboardTime').textContent = `UTC: ${timeString}`;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+
+    <!-- Main JavaScript -->
+    <script src="main.js"></script>
+</body>
+</html>
